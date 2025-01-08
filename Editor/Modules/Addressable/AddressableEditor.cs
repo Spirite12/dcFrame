@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using DCFrame;
 using UnityEditor;
@@ -24,20 +25,24 @@ public class AddressableEditor : Editor {
             Debug.LogError("Addressable Asset Settings not found!");
             return;
         }
-
+        List<float> progressList = new List<float>() { 0, 0.3f, 0.6f, 0.9f, 1 };
+        EditorUtility.DisplayProgressBar(ProgressTitle, "打AA包开始", progressList[0]);
         var groupSingle = InitGroupData(DCConst.AAGroupSingle);
-        DealWithGroupSingle(groupSingle);
+        DealWithGroupSingle(groupSingle, progressList[0], progressList[1]);
         var groupLabel = InitGroupData(DCConst.AAGroupLabel);
-        DealWithGroupLabel(groupLabel);
+        DealWithGroupLabel(groupLabel, progressList[1], progressList[2]);
         var groupFolder = InitGroupData(DCConst.AAGroupFolder);
-        DealWithGroupFolder(groupFolder);
+        DealWithGroupFolder(groupFolder, progressList[2], progressList[3]);
         AssetDatabase.SaveAssets();
+        EditorUtility.ClearProgressBar();
     }
 
     /// <summary>
     /// 处理组文件夹
     /// </summary>
-    private static void DealWithGroupFolder(AddressableAssetGroup targetGroup) {
+    private static void DealWithGroupFolder(AddressableAssetGroup targetGroup, float startValue, float endValue) {
+        int addCount = 0;
+        int totalCount = AARules.folderList.Count;
         foreach (var item in AARules.folderList) {
             // 收集排除队列
             Dictionary<string, bool> excludeDir = new Dictionary<string, bool>();
@@ -65,19 +70,24 @@ public class AddressableEditor : Editor {
                 AddressableAssetEntry entry = settings.CreateOrMoveEntry(guid, targetGroup);
                 entry.address = pathTp;
             }
+            addCount += 1;
+            float value = ((float)addCount / totalCount) * (endValue - startValue) + startValue;
+            EditorUtility.DisplayProgressBar(ProgressTitle, path, value);
         }
     }
     
     /// <summary>
     /// 处理单一文件
     /// </summary>
-    private static void DealWithGroupSingle(AddressableAssetGroup targetGroup) {
+    private static void DealWithGroupSingle(AddressableAssetGroup targetGroup, float startValue, float endValue) {
         void SetEntryInfo(string file, string address) {
             var guid = AssetDatabase.AssetPathToGUID(file);
             AddressableAssetEntry entry = settings.CreateOrMoveEntry(guid, targetGroup);
             entry.address = address;
         }
-        
+
+        int addCount = 0;
+        int totalCount = AARules.singleList.Count;
         foreach (var item in AARules.singleList) {
             var path = AssetDatabase.GetAssetPath(item);
             if (Directory.Exists(path)) {
@@ -93,17 +103,19 @@ public class AddressableEditor : Editor {
                 // 处理单个文件
                 SetEntryInfo(path, path);
             }
+            addCount += 1;
+            float value = ((float)addCount / totalCount) * (endValue - startValue) + startValue;
+            EditorUtility.DisplayProgressBar(ProgressTitle, path, value);
         }
     }
     
     /// <summary>
     /// 处理标签数据
     /// </summary>
-    private static void DealWithGroupLabel(AddressableAssetGroup targetGroup) {
-        // 清空标签
-        foreach (var label in settings.GetLabels()) {
-            settings.RemoveLabel(label);
-        }
+    private static void DealWithGroupLabel(AddressableAssetGroup targetGroup, float startValue, float endValue) {
+        // 记入使用的标签队列
+        Dictionary<string, bool> labelDic = new Dictionary<string, bool>();
+
         void SetEntryInfo(string path, string address, string label) {
             var guid = AssetDatabase.AssetPathToGUID(path);
             AddressableAssetEntry entry = settings.CreateOrMoveEntry(guid, targetGroup);
@@ -111,9 +123,12 @@ public class AddressableEditor : Editor {
             if (!settings.GetLabels().Contains(label)) {
                 settings.AddLabel(label);
             }
+            labelDic.TryAdd(label, true);
             entry.SetLabel(label, true, true);
         }
         
+        int addCount = 0;
+        int totalCount = AARules.labelList.Count;
         foreach (var item in AARules.labelList) {
             for (int i = 0; i < item.resList.Count; i++) {
                 var path = AssetDatabase.GetAssetPath(item.resList[i]);
@@ -130,6 +145,16 @@ public class AddressableEditor : Editor {
                     // 处理单个文件
                     SetEntryInfo(path, path, item.label);
                 }
+                addCount += 1;
+                float value = ((float)addCount / totalCount) * (endValue - startValue) + startValue;
+                EditorUtility.DisplayProgressBar(ProgressTitle, path, value);
+            }
+        }
+        
+        // 清空无用的标签
+        foreach (var label in settings.GetLabels()) {
+            if (!labelDic.ContainsKey(label)) {
+                settings.RemoveLabel(label);
             }
         }
     }
@@ -187,4 +212,6 @@ public class AddressableEditor : Editor {
 
     private static AddressableAssetSettings settings;
     private static AARules AARules;
+    
+    private const string ProgressTitle = "Addressable 打包";
 }
