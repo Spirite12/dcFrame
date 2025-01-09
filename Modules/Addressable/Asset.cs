@@ -40,12 +40,38 @@ namespace DCFrame.Asset {
         /// <summary>
         /// 获取贴图加载地址
         /// </summary>
-        public static string GetSprite(string path, EnumPrefixPath enumPrefix = EnumPrefixPath.Single) {
+        public static string GetSpritePath(string path, EnumPrefixPath enumPrefix = EnumPrefixPath.Single) {
             if (!PrefixPathDic.TryGetValue(enumPrefix, out string prefixPath)) {
-                Debug.LogError($"暂未支持当前前缀枚举： {enumPrefix}");
+                ErrorPrefixPathTips(enumPrefix);
                 return "";
             }
             return Path.Combine(prefixPath, $"{path}.png");;
+        }
+        
+        /// <summary>
+        /// 获取文本加载地址
+        /// </summary>
+        public static string GetTxtPath(string path, EnumPrefixPath enumPrefix = EnumPrefixPath.Single) {
+            if (!PrefixPathDic.TryGetValue(enumPrefix, out string prefixPath)) {
+                ErrorPrefixPathTips(enumPrefix);
+                return "";
+            }
+            return Path.Combine(prefixPath, $"{path}.txt");;
+        }
+        
+        /// <summary>
+        /// 获取预制件加载地址
+        /// </summary>
+        public static string GetPrefabPath(string path, EnumPrefixPath enumPrefix = EnumPrefixPath.Single) {
+            if (!PrefixPathDic.TryGetValue(enumPrefix, out string prefixPath)) {
+                ErrorPrefixPathTips(enumPrefix);
+                return "";
+            }
+            return Path.Combine(prefixPath, $"{path}.prefab");;
+        }
+
+        private static void ErrorPrefixPathTips(EnumPrefixPath enumPrefix) {
+            Debug.LogError($"暂未支持当前前缀枚举： {enumPrefix}");
         }
 
         #endregion
@@ -57,8 +83,36 @@ namespace DCFrame.Asset {
         /// </summary>
         private static readonly Dictionary<string, Func<string, UniTask<object>>> ExtensionDic = new(){ 
             { ".png", LoadAssetSprite },
+            { ".txt", LoadAssetTxt },
+            { ".prefab", LoadAssetPrefab },
         };
-        
+
+        /// <summary>
+        /// 下载 预制件 类型资源
+        /// </summary>
+        private static async UniTask<object> LoadAssetPrefab(string address) {
+            var handle = Addressables.LoadAssetAsync<GameObject>(address);
+            await handle.Task;
+            if (handle.Status != AsyncOperationStatus.Succeeded) {
+                Debug.LogError($"加载 Prefab 失败，地址是: {address}");
+                return null;
+            }
+            return handle.Result;
+        }
+
+        /// <summary>
+        /// 下载 文本 类型资源
+        /// </summary>
+        private static async UniTask<object> LoadAssetTxt(string address) {
+            var handle = Addressables.LoadAssetAsync<TextAsset>(address);
+            await handle.Task;
+            if (handle.Status != AsyncOperationStatus.Succeeded) {
+                Debug.LogError($"加载 Txt 失败，地址是: {address}");
+                return null;
+            }
+            return handle.Result;
+        }
+
         /// <summary>
         /// 加载 Sprite 类型资源
         /// </summary>

@@ -34,6 +34,7 @@ public class AddressableEditor : Editor {
         DealWithGroupFolder(groupFolder, progressList[2], progressList[3]);
         AssetDatabase.SaveAssets();
         EditorUtility.ClearProgressBar();
+        AddressableAssetSettings.BuildPlayerContent();
     }
 
     /// <summary>
@@ -67,7 +68,7 @@ public class AddressableEditor : Editor {
                 }
                 var guid = AssetDatabase.AssetPathToGUID(pathTp);
                 AddressableAssetEntry entry = settings.CreateOrMoveEntry(guid, targetGroup);
-                entry.address = pathTp;
+                entry.address = pathTp.Replace("\\", "/");
             }
             addCount += 1;
             float value = ((float)addCount / totalCount) * (endValue - startValue) + startValue;
@@ -82,7 +83,7 @@ public class AddressableEditor : Editor {
         void SetEntryInfo(string file, string address) {
             var guid = AssetDatabase.AssetPathToGUID(file);
             AddressableAssetEntry entry = settings.CreateOrMoveEntry(guid, targetGroup);
-            entry.address = address;
+            entry.address = address.Replace("\\", "/");
         }
 
         int addCount = 0;
@@ -96,7 +97,7 @@ public class AddressableEditor : Editor {
                     if (subPath.EndsWith(".meta")) {
                        continue;
                     }
-                    SetEntryInfo(subPath, path);
+                    SetEntryInfo(subPath, subPath);
                 }
             }else {
                 // 处理单个文件
@@ -118,7 +119,7 @@ public class AddressableEditor : Editor {
         void SetEntryInfo(string path, string address, string label) {
             var guid = AssetDatabase.AssetPathToGUID(path);
             AddressableAssetEntry entry = settings.CreateOrMoveEntry(guid, targetGroup);
-            entry.address = address;
+            entry.address = address.Replace("\\", "/");
             if (!settings.GetLabels().Contains(label)) {
                 settings.AddLabel(label);
             }
@@ -138,7 +139,7 @@ public class AddressableEditor : Editor {
                         if (subPath.EndsWith(".meta")) {
                             continue;
                         }
-                        SetEntryInfo(subPath, path, item.label);
+                        SetEntryInfo(subPath, subPath, item.label);
                     }
                 }else {
                     // 处理单个文件
