@@ -94,7 +94,7 @@ namespace DCFrame.Asset {
             var handle = Addressables.LoadAssetAsync<GameObject>(address);
             await handle.Task;
             if (handle.Status != AsyncOperationStatus.Succeeded) {
-                Debug.LogError($"加载 Prefab 失败，地址是: {address}");
+                Debug.LogError($"加载Prefab失败，地址是: {address}");
                 return null;
             }
             return handle.Result;
@@ -107,7 +107,7 @@ namespace DCFrame.Asset {
             var handle = Addressables.LoadAssetAsync<TextAsset>(address);
             await handle.Task;
             if (handle.Status != AsyncOperationStatus.Succeeded) {
-                Debug.LogError($"加载 Txt 失败，地址是: {address}");
+                Debug.LogError($"加载Txt失败，地址是: {address}");
                 return null;
             }
             return handle.Result;
@@ -120,7 +120,7 @@ namespace DCFrame.Asset {
             var handle = Addressables.LoadAssetAsync<Sprite>(address);
             await handle.Task;
             if (handle.Status != AsyncOperationStatus.Succeeded) {
-                Debug.LogError($"加载 Sprite 失败，地址是: {address}");
+                Debug.LogError($"加载Sprite失败，地址是: {address}");
                 return null;
             }
             return handle.Result;
