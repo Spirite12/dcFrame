@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
@@ -11,10 +11,10 @@ namespace DCFrame.Asset {
         /// <summary>
         /// 根据地址动态加载资源
         /// </summary>
-        public static async Task<object> LoadAsset(string address) {
+        public static async UniTask<object> LoadAsset(string address) {
             // 获取扩展名并判断是否支持
             string extension = Path.GetExtension(address).ToLower();
-            if (!ExtensionDic.TryGetValue(extension, out Func<string, Task<object>> loadFunc)) {
+            if (!ExtensionDic.TryGetValue(extension, out Func<string, UniTask<object>> loadFunc)) {
                 Debug.LogError($"暂未支持当前后缀名格式： {extension}");
                 return null;
             }
@@ -55,14 +55,14 @@ namespace DCFrame.Asset {
         /// <summary>
         /// 扩展名与加载函数的映射
         /// </summary>
-        private static readonly Dictionary<string, Func<string, Task<object>>> ExtensionDic = new(){ 
+        private static readonly Dictionary<string, Func<string, UniTask<object>>> ExtensionDic = new(){ 
             { ".png", LoadAssetSprite },
         };
         
         /// <summary>
         /// 加载 Sprite 类型资源
         /// </summary>
-        private static async Task<object> LoadAssetSprite(string address) {
+        private static async UniTask<object> LoadAssetSprite(string address) {
             var handle = Addressables.LoadAssetAsync<Sprite>(address);
             await handle.Task;
             if (handle.Status != AsyncOperationStatus.Succeeded) {
