@@ -113,6 +113,10 @@ public class AddressableEditor : Editor {
     /// 处理标签数据
     /// </summary>
     private static void DealWithGroupLabel(AddressableAssetGroup targetGroup, float startValue, float endValue) {
+        // 自定义一些组设置
+        var schemaBundle = targetGroup.GetSchema<BundledAssetGroupSchema>();
+        schemaBundle.BundleMode = BundledAssetGroupSchema.BundlePackingMode.PackTogetherByLabel;
+        
         // 记入使用的标签队列
         Dictionary<string, bool> labelDic = new Dictionary<string, bool>();
 
@@ -139,7 +143,7 @@ public class AddressableEditor : Editor {
                         if (subPath.EndsWith(".meta")) {
                             continue;
                         }
-                        SetEntryInfo(subPath, subPath, item.label);
+                        SetEntryInfo(path, path, item.label);
                     }
                 }else {
                     // 处理单个文件
