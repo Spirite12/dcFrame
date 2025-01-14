@@ -8,10 +8,6 @@ namespace DCFrame {
         /// </summary>
         public const string AARulesPath = "Assets/Game/Settings/Addressables/AARules.asset";
         /// <summary>
-        /// AA AssetGroup 路径
-        /// </summary>
-        public const string AAAssetGroupPath = "Assets/AddressableAssetsData/AssetGroups/";
-        /// <summary>
         /// AA 单文件打组
         /// </summary>
         public const string AAGroupSingle = "AAGroupSingle";

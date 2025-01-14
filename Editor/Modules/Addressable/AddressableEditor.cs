@@ -55,7 +55,7 @@ public class AddressableEditor : Editor {
                 continue;
             }
             
-            TraverseDirectories(path, 1, item.number, pathList);
+            FileUtil.TraverseDirectories(path, 1, item.number, pathList);
             foreach (var itemTp in item.excludePathList) {
                 var pathTp = AssetDatabase.GetAssetPath(itemTp);
                 excludeDir.Add(pathTp, true);
@@ -89,15 +89,19 @@ public class AddressableEditor : Editor {
         int addCount = 0;
         int totalCount = AARules.singleList.Count;
         foreach (var item in AARules.singleList) {
-            var path = AssetDatabase.GetAssetPath(item);
+            var path = AssetDatabase.GetAssetPath(item.asset);
             if (Directory.Exists(path)) {
                 // 处理文件夹下的所有文件
-                string[] subDirectories = Directory.GetFiles(path);
-                foreach (var subPath in subDirectories) {
-                    if (subPath.EndsWith(".meta")) {
-                       continue;
+                List<string> pathList = new List<string>();
+                FileUtil.TraverseDirectories(path, 1, item.directory.number, pathList);
+                foreach (var pathTp in pathList) {
+                    string[] subDirectories = Directory.GetFiles(pathTp, item.directory.searchPattern, item.directory.option);
+                    foreach (var subPath in subDirectories) {
+                        if (subPath.EndsWith(".meta")) {
+                            continue;
+                        }
+                        SetEntryInfo(subPath, subPath);
                     }
-                    SetEntryInfo(subPath, subPath);
                 }
             }else {
                 // 处理单个文件
@@ -135,15 +139,20 @@ public class AddressableEditor : Editor {
         int totalCount = AARules.labelList.Count;
         foreach (var item in AARules.labelList) {
             for (int i = 0; i < item.resList.Count; i++) {
-                var path = AssetDatabase.GetAssetPath(item.resList[i]);
+                var data = item.resList[i];
+                var path = AssetDatabase.GetAssetPath(data.asset);
                 if (Directory.Exists(path)) {
                     // 处理文件夹下的所有文件
-                    string[] subDirectories = Directory.GetFiles(path);
-                    foreach (var subPath in subDirectories) {
-                        if (subPath.EndsWith(".meta")) {
-                            continue;
+                    List<string> pathList = new List<string>();
+                    FileUtil.TraverseDirectories(path, 1, data.directory.number, pathList);
+                    foreach (var pathTp in pathList) {
+                        string[] subDirectories = Directory.GetFiles(pathTp, data.directory.searchPattern, data.directory.option);
+                        foreach (var subPath in subDirectories) {
+                            if (subPath.EndsWith(".meta")) {
+                                continue;
+                            }
+                            SetEntryInfo(path, path, item.label);
                         }
-                        SetEntryInfo(path, path, item.label);
                     }
                 }else {
                     // 处理单个文件
@@ -192,26 +201,6 @@ public class AddressableEditor : Editor {
             }
         }
         return targetGroup;
-    }
-    
-    /// 递归遍历目录，获取指定级别的子目录。
-    /// <param name="currentPath"> 当前路径 </param>
-    /// <param name="currentLevel"> 当前层级 </param>
-    /// <param name="targetLevel"> 目标层级 </param>
-    /// <param name="result"> 存储结果的列表 </param>
-    private static void TraverseDirectories(string currentPath, int currentLevel, int targetLevel, List<string> result) {
-        // 如果已经到达目标层级，添加当前路径到结果
-        if (currentLevel == targetLevel) {
-            string path = currentPath.Replace("\\", "/");
-            result.Add(path);
-            return;
-        }
-        // 获取当前路径下的所有子目录
-        string[] subDirectories = Directory.GetDirectories(currentPath);
-        // 递归处理每个子目录
-        foreach (string subDir in subDirectories) {
-            TraverseDirectories(subDir, currentLevel + 1, targetLevel, result);
-        }
     }
 
     private static AddressableAssetSettings settings;
