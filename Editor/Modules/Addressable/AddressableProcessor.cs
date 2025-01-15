@@ -58,38 +58,15 @@ public class AddressableProcessor : AssetPostprocessor {
                     if (single.directory.option == SearchOption.AllDirectories) {
                         string[] subDirectories = Directory.GetDirectories(pathTp, "*", SearchOption.AllDirectories);
                         var newPath = path.Replace("\\", "/");
-                        pathDir.TryAdd(newPath, new DirClass(){searchPattern = single.directory.searchPattern});
+                        pathDir.TryAdd(newPath, new DirClass() { searchPattern = single.directory.searchPattern });
                         foreach (var subPath in subDirectories) {
                             newPath = subPath.Replace("\\", "/");
-                            pathDir.TryAdd(newPath, new DirClass(){searchPattern = single.directory.searchPattern});
+                            pathDir.TryAdd(newPath, new DirClass() { searchPattern = single.directory.searchPattern });
                         }
-                    }else {
-                        var newPath = pathTp.Replace("\\", "/");
-                        pathDir.TryAdd(newPath, new DirClass(){searchPattern = single.directory.searchPattern});
                     }
-                }
-            }
-        }
-        foreach (var label in AARules.labelList) {
-            foreach (var res in label.resList) {
-                var path = AssetDatabase.GetAssetPath(res.asset);
-                if (Directory.Exists(path)) {
-                    List<string> pathList = new List<string>();
-                    FileUtil.TraverseDirectories(path, 1, res.directory.number, pathList);
-                    foreach (var pathTp in pathList) {
-                        if (res.directory.option == SearchOption.AllDirectories) {
-                            string[] subDirectories = Directory.GetDirectories(pathTp, "*", SearchOption.AllDirectories);
-                            var newPath = path.Replace("\\", "/");
-                            pathDir.TryAdd(newPath, new DirClass(){searchPattern = res.directory.searchPattern});
-                            foreach (var subPath in subDirectories) {
-                                newPath = subPath.Replace("\\", "/");
-                                pathDir.TryAdd(newPath, new DirClass() { searchPattern = res.directory.searchPattern, label = label.label});
-                            }
-                        }
-                        else {
-                            var newPath = pathTp.Replace("\\", "/");
-                            pathDir.TryAdd(newPath, new DirClass() { searchPattern = res.directory.searchPattern, label = label.label});
-                        }
+                    else {
+                        var newPath = pathTp.Replace("\\", "/");
+                        pathDir.TryAdd(newPath, new DirClass() { searchPattern = single.directory.searchPattern });
                     }
                 }
             }
