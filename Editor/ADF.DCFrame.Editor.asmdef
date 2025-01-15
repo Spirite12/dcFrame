@@ -2,7 +2,9 @@
     "name": "ADF.DCFrame.Editor",
     "rootNamespace": "",
     "references": [
-        "GUID:d62033d77ddcb03409c268879297c6ca"
+        "GUID:d62033d77ddcb03409c268879297c6ca",
+        "GUID:69448af7b92c7f342b298e06a37122aa",
+        "GUID:2853d361fff954b4d8671518b30c3805"
     ],
     "includePlatforms": [
         "Editor"
