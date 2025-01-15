@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
 
-namespace DCFrame.Asset {
+namespace DCFrame {
     public class Asset {
         /// <summary>
         /// 根据地址动态加载资源

@@ -6,6 +6,7 @@ using UnityEditor.AddressableAssets;
 using UnityEngine;
 using UnityEditor.AddressableAssets.Settings.GroupSchemas;
 using System.IO;
+using FileUtil = DCFrame.FileUtil;
 
 public class AddressableEditor : Editor {
     [MenuItem("Tools/资源项/打 AA 包")]

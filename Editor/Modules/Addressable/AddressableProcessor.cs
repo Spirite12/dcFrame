@@ -6,6 +6,7 @@ using UnityEditor;
 using UnityEditor.AddressableAssets;
 using UnityEditor.AddressableAssets.Settings;
 using UnityEngine;
+using FileUtil = DCFrame.FileUtil;
 
 public class AddressableProcessor : AssetPostprocessor {
 
